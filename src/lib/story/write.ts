@@ -5,6 +5,9 @@ import {
   TellActionGenerator,
 } from "./types";
 
+/** A value that can be returned to indicate the end of the story */
+export const END = Symbol();
+
 export function* tell(passage: Passage): TellActionGenerator {
   yield {
     action: "tell",

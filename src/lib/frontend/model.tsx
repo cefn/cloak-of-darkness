@@ -1,79 +1,62 @@
-import { createQueue } from "@lauf/queue";
 import { createStore } from "@lauf/store";
 import { PromptFn, TellFn } from "../story/types";
 
-type Completed = TellCompleted | PromptCompleted<any>;
-
-interface TellCompleted {
-  kind: "tell";
+export interface UiState {
+  ui: JSX.Element;
 }
 
-interface PromptCompleted<ChoiceId> {
-  kind: "prompt";
-  choiceId: ChoiceId;
-}
-
-interface FictionStore {
-  page: JSX.Element;
-}
-
-function initFictionStore(): FictionStore {
+function initUiState(): UiState {
   return {
-    page: <>Begin story</>,
+    ui: <>Begin story</>,
   };
 }
 
-function createModel() {
-  const fictionStore = createStore(initFictionStore());
-  const completedQueue = createQueue<Completed>();
-
-  async function awaitCompletedEvent<Kind extends Completed["kind"]>(
-    kind: Kind
-  ) {
-    const completed = await completedQueue.receive();
-    if (completed.kind !== kind) {
-      throw new Error(`Event of kind ${completed.kind} not ${kind}`);
-    }
-    return completed as Completed & { kind: Kind };
-  }
+export function createModel() {
+  const store = createStore(initUiState());
 
   const tell: TellFn = async function ({ passage }) {
-    fictionStore.write({
-      ...fictionStore.read(),
-      page: (
-        <>
-          {passage}
-          <button onClick={() => completedQueue.send({ kind: "tell" })}>
-            Next Page
-          </button>
-        </>
-      ),
-    });
-    await awaitCompletedEvent("tell");
+    return new Promise<void>((resolve) =>
+      store.write({
+        ui: (
+          <>
+            {passage}
+            <div>
+              <button onClick={() => resolve()}>Next</button>
+            </div>
+          </>
+        ),
+      })
+    );
   };
 
   const prompt: PromptFn = async function ({ passage, choices }) {
-    fictionStore.write({
-      ...fictionStore.read(),
-      page: (
-        <>
-          {passage}
-          {Object.entries(choices).map(([choiceId, choicePassage]) => (
-            <button
-              onClick={() =>
-                completedQueue.send({
-                  kind: "prompt",
-                  choiceId,
-                })
-              }
-            >
-              {choicePassage as JSX.Element}
-            </button>
-          ))}
-        </>
-      ),
-    });
-    const promptEvent = await awaitCompletedEvent("prompt");
-    return promptEvent.choiceId;
+    return new Promise<keyof typeof choices>((resolve) =>
+      store.write({
+        ui: (
+          <>
+            {passage}
+            {Object.entries(choices).map((entry) => {
+              const [choiceId, choicePassage] = entry as [
+                keyof typeof choices,
+                JSX.Element
+              ];
+              return (
+                <div>
+                  <button onClick={() => resolve(choiceId)}>
+                    {choicePassage}
+                  </button>
+                </div>
+              );
+            })}
+          </>
+        ),
+      })
+    );
+  };
+
+  return {
+    store,
+    tell,
+    prompt,
   };
 }

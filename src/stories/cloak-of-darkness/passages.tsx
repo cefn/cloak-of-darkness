@@ -1,6 +1,6 @@
-import { prompt, tell } from "../../lib/story/write";
-import type { Passage, StoryActionGenerator } from "../../lib/story/types";
-import { Destination, END, WorldState } from "./logic";
+import { END, prompt, tell } from "../../lib/story/write";
+import type { StoryActionGenerator } from "../../lib/story/types";
+import type { Destination, WorldState } from "../cloak-of-darkness/types";
 
 const cloakPassage = (
   <>
@@ -137,18 +137,25 @@ export function* cloakroom(
       {state.hasCloak ? (
         <>You could hang your cloak your cloak here.</>
       ) : (
-        <>You could pick up your cloak and wear it, if you like</>
+        <>
+          It holds your cloak. You could pick up your cloak and wear it, if you
+          like
+        </>
       )}
     </>
   );
 
   const defaultChoices = {
     east: <>Leave through the East door</>,
+    lookAtHook: <>Look at the hook</>,
   } as const;
 
   let choice;
   if (!state.hasCloak) {
-    choice = yield* prompt(passage, defaultChoices);
+    choice = yield* prompt(passage, {
+      ...defaultChoices,
+      wearCloak: <>Put on your Cloak</>,
+    });
   } else {
     choice = yield* prompt(passage, {
       ...defaultChoices,
@@ -156,9 +163,29 @@ export function* cloakroom(
     });
   }
 
-  if (choice === "hangCloak") {
-    state.hasCloak = false;
-    return "cloakroom";
+  if (choice === "east") {
+    return "lobby";
   }
-  return "lobby";
+
+  if (choice === "hangCloak") {
+    yield* tell(<>You hang up your cloak.</>);
+    state.hasCloak = false;
+  }
+  if (choice === "wearCloak") {
+    yield* tell(<>You put on your cloak</>);
+    state.hasCloak = true;
+  }
+  if (choice === "lookAtHook") {
+    yield* tell(
+      <>
+        It's just a small brass hook, screwed to the wall.
+        {state.hasCloak ? (
+          <>You could hang up your cloak here.</>
+        ) : (
+          <>Your coat is hanging there.</>
+        )}
+      </>
+    );
+  }
+  return "cloakroom";
 }

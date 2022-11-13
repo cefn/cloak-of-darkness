@@ -1,4 +1,3 @@
-import { GNexted } from "../util";
 import { PromptFn, StoryActionGenerator, TellFn } from "./types";
 
 interface RunOptions {
@@ -9,15 +8,20 @@ interface RunOptions {
 
 export async function read(options: RunOptions) {
   const { story, tell, prompt } = options;
+
+  type TellResult = Awaited<ReturnType<typeof tell>>;
+  type PromptResult = Awaited<ReturnType<typeof prompt>>;
+
   const pages = story();
-  let nextValue: GNexted<typeof pages> = undefined;
-  // loop over story pages, getting each page's data
-  // and handing it off to an async user interaction
+
+  let nextValue: TellResult | PromptResult = undefined;
+
+  // visit pages one by one, handing events off to
+  // the async user interface and waiting
   for (;;) {
-    const pageResult = pages.next(nextValue);
-    const { value, done } = pageResult;
+    const { value, done } = pages.next(nextValue);
     if (done) {
-      return pageResult.value;
+      return value;
     }
     const { action } = value;
     if (action === "tell") {

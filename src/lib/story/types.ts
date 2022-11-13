@@ -38,4 +38,4 @@ export type StoryActionGenerator<Ret = void> = DelegatingGenerator<
   Ret
 >;
 
-export type Story = () => StoryActionGenerator<void>;
+export type Story<Ret = void> = () => StoryActionGenerator<Ret>;
