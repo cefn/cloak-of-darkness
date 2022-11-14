@@ -2,14 +2,6 @@ import { END, prompt, tell } from "../../lib/story/write";
 import type { StoryActionGenerator } from "../../lib/story/types";
 import type { Destination, WorldState } from "../cloak-of-darkness/types";
 
-const cloakPassage = (
-  <>
-    A handsome cloak, of velvet trimmed with satin, and slightly spattered with
-    raindrops. Its blackness is so deep that it almost seems to suck light from
-    the room.
-  </>
-);
-
 export function* outside(state: WorldState): StoryActionGenerator<Destination> {
   yield* tell(
     <>
@@ -44,7 +36,13 @@ export function* lobby(state: WorldState): StoryActionGenerator<Destination> {
   );
 
   if (choice === "inspectCloak") {
-    yield* tell(cloakPassage);
+    yield* tell(
+      <>
+        A handsome cloak, of velvet trimmed with satin, and slightly spattered
+        with raindrops. Its blackness is so deep that it almost seems to suck
+        light from the room.
+      </>
+    );
     return "lobby";
   }
   return choice;
