@@ -1,9 +1,9 @@
-import { PromptFn, StoryActionGenerator, TellFn } from "./types";
+import { PromptFn, StoryGenerator, TellFn } from "./types";
 
 interface RunOptions {
   tell: TellFn;
   prompt: PromptFn;
-  story: () => StoryActionGenerator;
+  story: () => StoryGenerator;
 }
 
 export async function read(options: RunOptions) {

@@ -1,25 +1,9 @@
-import { StoryActionGenerator } from "../../lib/story/types";
+import type { Story } from "../../lib/story/types";
 import { END } from "../../lib/story/write";
-import type { Destination, Room } from "../cloak-of-darkness/types";
-import { outside, lobby, bar, cloakroom } from "../cloak-of-darkness/passages";
+import { createWorld, initWorldState, Destination, Room } from "./content";
 
-export function createWorld() {
-  return {
-    outside,
-    lobby,
-    bar,
-    cloakroom,
-  };
-}
-
-export function initWorldState() {
-  return {
-    shakenCloak: false,
-    hasCloak: true,
-  };
-}
-
-export function* story(): StoryActionGenerator {
+// TODO consider how to make this a generic function (that composes a Destination and Room type from the state functions )
+export const story: Story = function* () {
   // initialise
   const world = createWorld();
   const worldState = initWorldState();
@@ -37,7 +21,7 @@ export function* story(): StoryActionGenerator {
     // otherwise retrieve the room from the destination (RoomId)
     const room: Room = world[destination];
 
-    // complete room sequence to get next destination
+    // complete room sequence to be given next destination
     destination = yield* room(worldState);
   }
-}
+};

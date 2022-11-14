@@ -11,7 +11,7 @@ export interface TellOptions {
 export interface PromptOptions<ChoiceId extends Id> {
   passage: Passage;
   choices: {
-    [id in ChoiceId]: Passage;
+    [id in ChoiceId]?: Passage;
   };
 }
 
@@ -24,18 +24,18 @@ export type PromptFn = <ChoiceId extends Id>(
 export type TellActionGenerator = Generator<
   TellOptions & { action: "tell" },
   void,
-  any
+  any // TODO revisit this for strictness (although it doesn't surface in API)
 >;
 
 export type PromptActionGenerator<ChoiceId extends Id> = Generator<
   PromptOptions<ChoiceId> & { action: "prompt" },
   ChoiceId,
-  any
+  any // TODO revisit this for strictness (although it doesn't surface in API)
 >;
 
-export type StoryActionGenerator<Ret = void> = DelegatingGenerator<
+export type StoryGenerator<Ret = void> = DelegatingGenerator<
   GeneratorUnion<TellActionGenerator | PromptActionGenerator<Id>>,
   Ret
 >;
 
-export type Story<Ret = void> = () => StoryActionGenerator<Ret>;
+export type Story<Ret = void> = () => StoryGenerator<Ret>;

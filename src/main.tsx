@@ -10,6 +10,7 @@ import { story } from "./stories/cloak-of-darkness/story";
 const { tell, prompt, store } = createModel();
 
 /** Launch the story, which will trigger the async operations */
+
 read({ story, tell, prompt });
 
 /** Set up a view that will render the watchable JSX component. */

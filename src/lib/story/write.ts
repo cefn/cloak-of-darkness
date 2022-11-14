@@ -15,10 +15,10 @@ export function* tell(passage: Passage): TellActionGenerator {
   };
 }
 
-export function* prompt<ChoiceId extends Id>(
+export function* prompt<ChoiceId extends string>(
   passage: Passage,
   choices: {
-    [choice in ChoiceId]: Passage;
+    [id in ChoiceId]?: Passage;
   }
 ): PromptActionGenerator<ChoiceId> {
   const choice = yield {
@@ -26,5 +26,5 @@ export function* prompt<ChoiceId extends Id>(
     passage,
     choices,
   };
-  return choice;
+  return choice as ChoiceId;
 }
