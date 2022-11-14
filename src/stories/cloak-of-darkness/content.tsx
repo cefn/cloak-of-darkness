@@ -1,8 +1,8 @@
 import { END, prompt, tell } from "../../lib/story/write";
 import type { StoryGenerator } from "../../lib/story/types";
 
-type WorldState = ReturnType<typeof initWorldState>;
 type World = ReturnType<typeof createWorld>;
+type WorldState = ReturnType<typeof initWorldState>;
 
 /** Types shared with story logic (navigating between rooms) */
 export type Destination = keyof World | typeof END;
@@ -44,18 +44,26 @@ export const lobby: Room = function* (state) {
     );
   }
 
+  const defaultChoices = {
+    preventedNorth: <>Go North</>,
+    bar: <>Go South</>,
+    cloakroom: <>Go West</>,
+  };
+
+  const choices = !state.hasCloak
+    ? defaultChoices
+    : {
+        ...defaultChoices,
+        inspectCloak: <>Inspect your cloak</>,
+      };
+
   const choice = yield* prompt(
     <>
       You are standing in a spacious hall, splendidly decorated in red and gold,
       with glittering chandeliers overhead. The entrance from the street is to
       the north, and there are doorways south and west.
     </>,
-    {
-      preventedNorth: <>Go North</>,
-      bar: <>Go South</>,
-      cloakroom: <>Go West</>,
-      inspectCloak: <>Inspect your cloak</>,
-    }
+    choices
   );
 
   if (choice === "inspectCloak") {

@@ -21,6 +21,9 @@ export async function read(options: RunOptions) {
   for (;;) {
     const { value, done } = pages.next(nextValue);
     if (done) {
+      await tell({
+        passage: <h1>The End</h1>,
+      });
       return value;
     }
     const { action } = value;

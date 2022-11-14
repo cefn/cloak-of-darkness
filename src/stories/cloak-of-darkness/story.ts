@@ -8,7 +8,7 @@ export const story: Story = function* () {
   const world = createWorld();
   const worldState = initWorldState();
 
-  // begin in the lobby
+  // begin outside the lobby
   let destination: Destination = "outside";
 
   // keep visiting destinations until you reach the end

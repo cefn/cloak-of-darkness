@@ -1,9 +1,4 @@
-import {
-  Id,
-  Passage,
-  PromptActionGenerator,
-  TellActionGenerator,
-} from "./types";
+import { Passage, PromptActionGenerator, TellActionGenerator } from "./types";
 
 /** A value that can be returned to indicate the end of the story */
 export const END = Symbol();
