@@ -4,6 +4,12 @@ import { UiState } from "./model";
 
 export function Ui(props: { store: Store<UiState> }) {
   const { store } = props;
+  const title = useSelected(store, (state) => state.title);
   const ui = useSelected(store, (state) => state.ui);
-  return <>{ui}</>;
+  return (
+    <>
+      {title}
+      {ui}
+    </>
+  );
 }

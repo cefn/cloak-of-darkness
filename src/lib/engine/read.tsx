@@ -1,13 +1,14 @@
-import { PromptFn, StoryGenerator, TellFn } from "./types";
+import { PromptFn, StoryGenerator, TellFn, TitleFn } from "./types";
 
 interface RunOptions {
+  title: TitleFn;
   tell: TellFn;
   prompt: PromptFn;
   story: () => StoryGenerator;
 }
 
 export async function read(options: RunOptions) {
-  const { story, tell, prompt } = options;
+  const { story, tell, title, prompt } = options;
 
   type TellResult = Awaited<ReturnType<typeof tell>>;
   type PromptResult = Awaited<ReturnType<typeof prompt>>;
@@ -27,6 +28,9 @@ export async function read(options: RunOptions) {
       return value;
     }
     const { action } = value;
+    if (action === "title") {
+      nextValue = await title(value);
+    }
     if (action === "tell") {
       nextValue = await tell(value);
     }

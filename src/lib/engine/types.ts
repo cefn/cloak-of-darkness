@@ -4,6 +4,10 @@ export type Id = string;
 
 export type Passage = JSX.Element;
 
+export interface TitleOptions {
+  passage: Passage;
+}
+
 export interface TellOptions {
   passage: Passage;
 }
@@ -15,11 +19,19 @@ export interface PromptOptions<ChoiceId extends Id> {
   };
 }
 
+export type TitleFn = (options: TitleOptions) => Promise<void>;
+
 export type TellFn = (options: TellOptions) => Promise<void>;
 
 export type PromptFn = <ChoiceId extends Id>(
   options: PromptOptions<ChoiceId>
 ) => Promise<ChoiceId>;
+
+export type TitleActionGenerator = Generator<
+  TitleOptions & { action: "title" },
+  void,
+  any // TODO revisit this for strictness (although it doesn't surface in API)
+>;
 
 export type TellActionGenerator = Generator<
   TellOptions & { action: "tell" },
@@ -34,7 +46,9 @@ export type PromptActionGenerator<ChoiceId extends Id> = Generator<
 >;
 
 export type StoryGenerator<Ret = void> = DelegatingGenerator<
-  GeneratorUnion<TellActionGenerator | PromptActionGenerator<Id>>,
+  GeneratorUnion<
+    TitleActionGenerator | TellActionGenerator | PromptActionGenerator<Id>
+  >,
   Ret
 >;
 

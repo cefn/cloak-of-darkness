@@ -1,6 +1,15 @@
-import type { Story } from "../../lib/engine/types";
-import { END } from "../../lib/engine/write";
-import { createWorld, initWorldState, Destination, Room } from "./content";
+import type { Passage, Story } from "../../lib/engine/types";
+import { END, title } from "../../lib/engine/write";
+import { createWorld, initWorldState } from "./content";
+import { Destination, Room } from "./types";
+
+const titles: { [k in Destination]: Passage } = {
+  bar: <>Bar</>,
+  cloakroom: <>Cloakroom</>,
+  lobby: <>Lobby</>,
+  outside: <>Outside the Opera House</>,
+  [END]: <>You have finished the game</>,
+};
 
 // TODO consider how to make this a generic function (that composes a Destination and Room type from the state functions )
 export const story: Story = function* () {
@@ -13,6 +22,8 @@ export const story: Story = function* () {
 
   // keep visiting destinations until you reach the end
   for (;;) {
+    yield* title(titles[destination]);
+
     // check if story is complete
     if (destination === END) {
       return;
