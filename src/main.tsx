@@ -1,18 +1,19 @@
+import { createStore } from "@lauf/store";
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { createModel } from "./lib/frontend/model";
-import { Ui } from "./lib/frontend/Ui";
-import { read } from "./lib/engine/read";
+import { Ui } from "./lib/frontend/components/Ui";
+import { initialiseReaderState } from "./lib/frontend/context";
+import { read } from "./lib/frontend/read";
+import { ReaderState } from "./lib/frontend/types";
 import { story } from "./stories/cloak-of-darkness/story";
 
-/** Create a model defining async operations that manipulate a watchable JSX component */
-const { title, tell, prompt, store } = createModel();
+// Create store
+const store = createStore<ReaderState>(initialiseReaderState());
 
-/** Launch the story, which will trigger the async operations */
+// launch story which will write to store
+read(story, store);
 
-read({ title, story, tell, prompt });
-
-/** Set up a view that will render the watchable JSX component. */
+// render the store
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <div className="flex flex-col min-w-full h-screen">

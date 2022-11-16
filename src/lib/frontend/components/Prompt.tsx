@@ -1,25 +1,28 @@
-import { PromptOptions } from "../../engine/types";
-import { Button, ButtonGroup } from "react-daisyui";
+import { useSelected } from "@lauf/store-react";
+import { Button } from "react-daisyui";
+import { safeEntries } from "../../util";
+import { useReaderStore } from "../context";
 import { PassagePane } from "./PassagePane";
 
-export function Prompt<ChoiceId extends string>({
-  passage,
-  choices,
-  choose,
-}: PromptOptions<ChoiceId> & { choose: (choice: ChoiceId) => void }) {
+export function Prompt() {
+  const store = useReaderStore();
+  const page = useSelected(store, (state) => state.page);
+
+  if (!(page.kind === "prompt")) {
+    return <></>;
+  }
+
+  const { passage, choices, selectChoice } = page;
+
   return (
     <PassagePane passage={passage}>
       <div className="flex flex-col">
-        {Object.entries(choices).map((entry) => {
-          const [choiceId, choicePassage] = entry as [
-            keyof typeof choices,
-            JSX.Element
-          ];
+        {safeEntries(choices).map(([choiceId, choicePassage]) => {
           return (
             <Button
               color="primary"
               className="w-fit m-1"
-              onClick={() => choose(choiceId)}
+              onClick={() => selectChoice(choiceId)}
             >
               {choicePassage}
             </Button>

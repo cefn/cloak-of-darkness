@@ -1,5 +1,5 @@
+import { END, prompt, tell } from "../../lib/engine/actions";
 import type { Room } from "./types";
-import { tell, prompt, END } from "../../lib/engine/write";
 
 export function initWorldState() {
   return {
@@ -198,7 +198,7 @@ export const lightBar: Room = function* (state) {
     <>
       The bar, much rougher than you'd have guessed after the opulence of the
       foyer to the north, is completely empty. You're glad you hung up your
-      cloak. It's darkness would have sucked all the dim light from this room.
+      cloak. Its darkness would have sucked all the dim light from this room.
       Through the dim light you make out some sort of message scrawled in the
       sawdust on the floor.
     </>

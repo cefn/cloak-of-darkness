@@ -1,5 +1,5 @@
-import type { Passage, Story } from "../../lib/engine/types";
-import { END, title } from "../../lib/engine/write";
+import { END, title } from "../../lib/engine/actions";
+import { Passage, Story } from "../../lib/engine/types";
 import { createWorld, initWorldState } from "./content";
 import { Destination, Room } from "./types";
 
@@ -22,6 +22,7 @@ export const story: Story = function* () {
 
   // keep visiting destinations until you reach the end
   for (;;) {
+    // populate the title according to the current room
     yield* title(titles[destination]);
 
     // check if story is complete

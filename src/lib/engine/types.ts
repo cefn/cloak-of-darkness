@@ -1,58 +1,36 @@
-import {
-  DelegatingGenerator,
-  GeneratorUnion,
-  GNexted,
-  GYielded,
-} from "../util";
+import { DelegatingGenerator } from "../util";
+import { tell, title, prompt } from "./actions";
 
 export type Id = string;
 
 export type Passage = JSX.Element;
 
-export interface TitleOptions {
+export interface TitleAction {
+  kind: "title";
   passage: Passage;
 }
 
-export interface TellOptions {
+export interface TellAction {
+  kind: "tell";
   passage: Passage;
 }
 
-export interface PromptOptions<ChoiceId extends Id> {
+export interface PromptAction<ChoiceId extends Id> {
+  kind: "prompt";
   passage: Passage;
   choices: {
     [id in ChoiceId]?: Passage;
   };
 }
 
-export type TitleFn = (options: TitleOptions) => Promise<void>;
-
-export type TellFn = (options: TellOptions) => Promise<void>;
-
-export type PromptFn = <ChoiceId extends Id>(
-  options: PromptOptions<ChoiceId>
-) => Promise<ChoiceId>;
-
-export type TitleActionGenerator = Generator<
-  TitleOptions & { action: "title" },
-  void,
-  void
->;
-
-export type TellActionGenerator = Generator<
-  TellOptions & { action: "tell" },
-  void,
-  void
->;
-
-export type PromptActionGenerator<ChoiceId extends Id> = Generator<
-  PromptOptions<ChoiceId> & { action: "prompt" },
-  ChoiceId,
-  ChoiceId
->;
-
-export type StoryGenerator<Ret> = DelegatingGenerator<
-  TitleActionGenerator | TellActionGenerator | PromptActionGenerator<Id>,
+/** An ActionSequence is a sequence of calls to title, tell, prompt, which
+ * finally results in some value that serves the logic of its calling generator. */
+export type ActionSequence<Ret> = DelegatingGenerator<
+  | ReturnType<typeof title>
+  | ReturnType<typeof tell>
+  | ReturnType<typeof prompt>,
   Ret
 >;
 
-export type Story<Ret = void> = () => StoryGenerator<Ret>;
+/** A story is a factory for a sequence of actions that doesn't return anything */
+export type Story = () => ActionSequence<void>;
