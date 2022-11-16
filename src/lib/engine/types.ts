@@ -1,4 +1,9 @@
-import { DelegatingGenerator, GeneratorUnion } from "../util";
+import {
+  DelegatingGenerator,
+  GeneratorUnion,
+  GNexted,
+  GYielded,
+} from "../util";
 
 export type Id = string;
 
@@ -30,33 +35,24 @@ export type PromptFn = <ChoiceId extends Id>(
 export type TitleActionGenerator = Generator<
   TitleOptions & { action: "title" },
   void,
-  any // TODO revisit this for strictness (although it doesn't surface in API)
+  void
 >;
 
 export type TellActionGenerator = Generator<
   TellOptions & { action: "tell" },
   void,
-  any // TODO revisit this for strictness (although it doesn't surface in API)
+  void
 >;
 
 export type PromptActionGenerator<ChoiceId extends Id> = Generator<
   PromptOptions<ChoiceId> & { action: "prompt" },
   ChoiceId,
-  any // TODO revisit this for strictness (although it doesn't surface in API)
+  ChoiceId
 >;
 
-export type StoryGenerator<Ret = void> = DelegatingGenerator<
-  GeneratorUnion<
-    TitleActionGenerator | TellActionGenerator | PromptActionGenerator<Id>
-  >,
+export type StoryGenerator<Ret> = DelegatingGenerator<
+  TitleActionGenerator | TellActionGenerator | PromptActionGenerator<Id>,
   Ret
 >;
-
-// if the above is too complicated
-// export type StoryGenerator<Ret> = Generator<
-//   GYielded<TellActionGenerator | PromptActionGenerator<Id>>,
-//   Ret,
-//   any
-// >
 
 export type Story<Ret = void> = () => StoryGenerator<Ret>;

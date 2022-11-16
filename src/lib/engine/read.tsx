@@ -4,18 +4,16 @@ interface RunOptions {
   title: TitleFn;
   tell: TellFn;
   prompt: PromptFn;
-  story: () => StoryGenerator;
+  story: () => StoryGenerator<void>;
 }
 
 export async function read(options: RunOptions) {
   const { story, tell, title, prompt } = options;
 
-  type TellResult = Awaited<ReturnType<typeof tell>>;
-  type PromptResult = Awaited<ReturnType<typeof prompt>>;
-
   const pages = story();
 
-  let nextValue: TellResult | PromptResult = undefined;
+  /** Prompt passes a value back to its yield. All others pass back undefined*/
+  let nextValue: Awaited<ReturnType<typeof prompt>> | void = undefined;
 
   // visit pages one by one, handing events off to
   // the async user interface and waiting
