@@ -73,14 +73,7 @@ export const cloakroom: Room = function* (state) {
     <>
       The walls of this small room were clearly once lined with hooks, though
       now only one remains.
-      {state.hasCloak ? (
-        <>You could hang your cloak here.</>
-      ) : (
-        <>
-          It holds your cloak. You could pick up your cloak and wear it, if you
-          like
-        </>
-      )}
+      {!state.hasCloak && <> It holds your cloak.</>}
     </>,
     {
       east: <>Leave through the East door</>,
@@ -111,11 +104,7 @@ export const cloakroom: Room = function* (state) {
     yield* tell(
       <>
         It's just a small brass hook, screwed to the wall.
-        {state.hasCloak ? (
-          <>You could hang up your cloak here.</>
-        ) : (
-          <>Your coat is hanging there.</>
-        )}
+        {!state.hasCloak && <> Your coat is hanging there.</>}
       </>
     );
   }

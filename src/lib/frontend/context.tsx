@@ -1,4 +1,4 @@
-import { createStore } from "@lauf/store";
+import { Store } from "@lauf/store";
 import { createContext, useContext } from "react";
 import { ReaderState } from "./types";
 
@@ -11,10 +11,14 @@ export function initialiseReaderState(): ReaderState {
   };
 }
 
-export const ReaderStoreContext = createContext(
-  createStore<ReaderState>(initialiseReaderState())
+export const ReaderStoreContext = createContext<Store<ReaderState> | null>(
+  null
 );
 
 export function useReaderStore() {
-  return useContext(ReaderStoreContext);
+  const value = useContext(ReaderStoreContext);
+  if (value === null) {
+    throw new Error("No Reader store available");
+  }
+  return value;
 }

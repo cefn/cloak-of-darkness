@@ -15,17 +15,14 @@ export async function read(story: Story, store: Store<ReaderState>) {
       return value;
     }
 
-    // render title without waiting
     if (value.kind === "title") {
+      // render title
       store.write({
         ...store.read(),
         title: value.passage,
       });
-      continue;
-    }
-
-    // render tell page, wait for turnPage callback
-    if (value.kind === "tell") {
+    } else if (value.kind === "tell") {
+      // render tell page, await turnPage callback
       await new Promise<void>((resolve) => {
         store.write({
           ...store.read(),
@@ -35,11 +32,8 @@ export async function read(story: Story, store: Store<ReaderState>) {
           },
         });
       });
-      continue;
-    }
-
-    // render prompt page, wait for selectChoice callback
-    if (value.kind === "prompt") {
+    } else if (value.kind === "prompt") {
+      // render prompt page, await selectChoice callback
       nextValue = await new Promise<string>((resolve) => {
         store.write({
           ...store.read(),
@@ -49,10 +43,9 @@ export async function read(story: Story, store: Store<ReaderState>) {
           },
         });
       });
-      continue;
+    } else {
+      // above cases should be exhaustive - this should never be reached
+      unhandled(value);
     }
-
-    // above cases should be exhaustive - this should never be reached
-    unhandled(value);
   }
 }

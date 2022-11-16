@@ -4,8 +4,7 @@ import { useReaderStore } from "../context";
 import { PassagePane } from "./PassagePane";
 
 export function Tell() {
-  const store = useReaderStore();
-  const page = useSelected(store, (state) => state.page);
+  const page = useSelected(useReaderStore(), (state) => state.page);
 
   if (!(page.kind === "tell")) {
     return <></>;

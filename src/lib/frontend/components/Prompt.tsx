@@ -5,8 +5,7 @@ import { useReaderStore } from "../context";
 import { PassagePane } from "./PassagePane";
 
 export function Prompt() {
-  const store = useReaderStore();
-  const page = useSelected(store, (state) => state.page);
+  const page = useSelected(useReaderStore(), (state) => state.page);
 
   if (!(page.kind === "prompt")) {
     return <></>;
