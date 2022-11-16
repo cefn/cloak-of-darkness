@@ -1,5 +1,5 @@
-import type { Story } from "../../lib/story/types";
-import { END } from "../../lib/story/write";
+import type { Story } from "../../lib/engine/types";
+import { END } from "../../lib/engine/write";
 import { createWorld, initWorldState, Destination, Room } from "./content";
 
 // TODO consider how to make this a generic function (that composes a Destination and Room type from the state functions )

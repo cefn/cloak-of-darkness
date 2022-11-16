@@ -38,4 +38,11 @@ export type StoryGenerator<Ret = void> = DelegatingGenerator<
   Ret
 >;
 
+// if the above is too complicated
+// export type StoryGenerator<Ret> = Generator<
+//   GYielded<TellActionGenerator | PromptActionGenerator<Id>>,
+//   Ret,
+//   any
+// >
+
 export type Story<Ret = void> = () => StoryGenerator<Ret>;

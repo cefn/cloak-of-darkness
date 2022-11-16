@@ -1,5 +1,5 @@
 import { createStore } from "@lauf/store";
-import { PromptFn, TellFn } from "../story/types";
+import { PromptFn, TellFn } from "../engine/types";
 
 export interface UiState {
   ui: JSX.Element;

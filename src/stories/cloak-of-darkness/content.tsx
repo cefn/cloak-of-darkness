@@ -1,12 +1,12 @@
-import { END, prompt, tell } from "../../lib/story/write";
-import type { StoryGenerator } from "../../lib/story/types";
+import type { Room } from "./types";
+import { tell, prompt, END } from "../../lib/engine/write";
 
-type World = ReturnType<typeof createWorld>;
-type WorldState = ReturnType<typeof initWorldState>;
-
-/** Types shared with story logic (navigating between rooms) */
-export type Destination = keyof World | typeof END;
-export type Room = (state: WorldState) => StoryGenerator<Destination>;
+export function initWorldState() {
+  return {
+    turnsInBar: 0,
+    hasCloak: true,
+  };
+}
 
 export function createWorld() {
   return {
@@ -14,14 +14,6 @@ export function createWorld() {
     lobby,
     cloakroom,
     bar,
-  };
-}
-
-export function initWorldState() {
-  return {
-    turnsInBar: 0,
-    shakenCloak: false,
-    hasCloak: true,
   };
 }
 
@@ -33,37 +25,25 @@ export const outside: Room = function* () {
       about but, hey, what do you expect in a cheap demo game...?
     </>
   );
+  yield* tell(
+    <>Shaking the rain from your Cloak, you step gratefully inside.</>
+  );
   return "lobby";
 };
 
 export const lobby: Room = function* (state) {
-  if (!state.shakenCloak) {
-    state.shakenCloak = true;
-    yield* tell(
-      <>Shaking the rain from your Cloak, you step gratefully inside.</>
-    );
-  }
-
-  const defaultChoices = {
-    preventedNorth: <>Go North</>,
-    bar: <>Go South</>,
-    cloakroom: <>Go West</>,
-  };
-
-  const choices = !state.hasCloak
-    ? defaultChoices
-    : {
-        ...defaultChoices,
-        inspectCloak: <>Inspect your cloak</>,
-      };
-
   const choice = yield* prompt(
     <>
       You are standing in a spacious hall, splendidly decorated in red and gold,
       with glittering chandeliers overhead. The entrance from the street is to
       the north, and there are doorways south and west.
     </>,
-    choices
+    {
+      preventedNorth: <>Go North</>,
+      bar: <>Go South</>,
+      cloakroom: <>Go West</>,
+      ...(state.hasCloak && { inspectCloak: <>Inspect your cloak</> }),
+    }
   );
 
   if (choice === "inspectCloak") {
@@ -89,27 +69,12 @@ export const lobby: Room = function* (state) {
 };
 
 export const cloakroom: Room = function* (state) {
-  const commonChoices = {
-    east: <>Leave through the East door</>,
-    lookAtHook: <>Look at the hook</>,
-  };
-
-  const choices = state.hasCloak
-    ? {
-        ...commonChoices,
-        hangCloak: <>Hang up your Cloak</>,
-      }
-    : {
-        ...commonChoices,
-        wearCloak: <>Put on your Cloak</>,
-      };
-
   const choice = yield* prompt(
     <>
       The walls of this small room were clearly once lined with hooks, though
       now only one remains.
       {state.hasCloak ? (
-        <>You could hang your cloak your cloak here.</>
+        <>You could hang your cloak here.</>
       ) : (
         <>
           It holds your cloak. You could pick up your cloak and wear it, if you
@@ -117,7 +82,17 @@ export const cloakroom: Room = function* (state) {
         </>
       )}
     </>,
-    choices
+    {
+      east: <>Leave through the East door</>,
+      lookAtHook: <>Look at the hook</>,
+      ...(state.hasCloak
+        ? {
+            hangCloak: <>Hang up your Cloak</>,
+          }
+        : {
+            wearCloak: <>Put on your Cloak</>,
+          }),
+    }
   );
 
   if (choice === "east") {
@@ -232,7 +207,7 @@ export const lightBar: Room = function* (state) {
     yield* tell(
       <>
         The message, neatly marked in the sawdust, reads...
-        <h1>You have won</h1>
+        <h1>You have won!</h1>
       </>
     );
   } else {
@@ -240,9 +215,10 @@ export const lightBar: Room = function* (state) {
       <>
         On the floor is a pile of sawdust scuffed by many footprints. You can
         make out a few letters...
-        <h1>You h*v* w*n</h1>
+        <h3>You h*v* w*n</h3>
         ...but the rest of the message has been lost. You can never know the
-        secret of the Opera House now!
+        secret of the Opera House now.
+        <h1>You have lost!</h1>
       </>
     );
   }
