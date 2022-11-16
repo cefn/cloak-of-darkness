@@ -33,5 +33,5 @@ export function* prompt<ChoiceId extends string>(
     passage,
     choices,
   };
-  return choice as ChoiceId;
+  return choice;
 }

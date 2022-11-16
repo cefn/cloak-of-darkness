@@ -17,7 +17,7 @@ export function Prompt<ChoiceId extends string>({
           ];
           return (
             <Button
-              color="warning"
+              color="primary"
               className="w-fit m-1"
               onClick={() => choose(choiceId)}
             >
