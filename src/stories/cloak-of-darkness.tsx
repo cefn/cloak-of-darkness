@@ -1,11 +1,11 @@
 import { ActionSequence } from "../lib/engine/types";
 import { END, prompt, tell } from "../lib/engine/actions";
 
-type CloakWorld = ReturnType<typeof createRooms>;
-type CloakState = ReturnType<typeof createWorldState>;
+type StoryRooms = ReturnType<typeof createRooms>;
+type StoryState = ReturnType<typeof createWorldState>;
 
-type RoomId = keyof CloakWorld;
-type Room = (state: CloakState) => ActionSequence<RoomId | typeof END>;
+type RoomId = keyof StoryRooms;
+type Room = (state: StoryState) => ActionSequence<RoomId | typeof END>;
 
 export function createRooms() {
   return {
@@ -18,7 +18,7 @@ export function createRooms() {
 
 export function createWorldState() {
   // avoid inferring roomId as just string
-  // will be fixed by satisfies operator in Typescript 4.9
+  // maybe fixed by satisfies operator in Typescript 4.9
   const initialRoomId: RoomId = "outside";
   return {
     turnsInBar: 0,
