@@ -1,11 +1,18 @@
 import { ActionSequence } from "../lib/engine/types";
 import { END, prompt, tell } from "../lib/engine/actions";
+import { RoomState } from "../lib/engine/formats/room";
 
-type StoryRooms = ReturnType<typeof createRooms>;
-type StoryState = ReturnType<typeof createWorldState>;
+/** A Room yields tell and prompt pages, then returns a destination RoomId */
+type Room = (state: WorldState) => ActionSequence<RoomId | typeof END>;
 
-type RoomId = keyof StoryRooms;
-type Room = (state: StoryState) => ActionSequence<RoomId | typeof END>;
+/** State consumed and manipulated within Room Logic */
+interface WorldState extends RoomState<RoomId> {
+  turnsInBar: number;
+  hasCloak: boolean;
+}
+
+/** Derive RoomId from the room lookup */
+type RoomId = keyof ReturnType<typeof createRooms>;
 
 export function createRooms() {
   return {
@@ -16,14 +23,11 @@ export function createRooms() {
   };
 }
 
-export function createWorldState() {
-  // avoid inferring roomId as just string
-  // maybe fixed by satisfies operator in Typescript 4.9
-  const initialRoomId: RoomId = "outside";
+export function createWorldState(): WorldState {
   return {
     turnsInBar: 0,
     hasCloak: true,
-    roomId: initialRoomId,
+    roomId: "outside",
     roomTitles: {
       bar: <>Bar</>,
       cloakroom: <>Cloakroom</>,
