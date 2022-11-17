@@ -32,7 +32,10 @@ export async function readSequence(
         ...store.read(),
         title: value.passage,
       });
-    } else if (value.kind === "tell") {
+      continue;
+    }
+
+    if (value.kind === "tell") {
       // render tell page, await turnPage callback
       await new Promise<void>((resolve) => {
         store.write({
@@ -43,7 +46,10 @@ export async function readSequence(
           },
         });
       });
-    } else if (value.kind === "prompt") {
+      continue;
+    }
+
+    if (value.kind === "prompt") {
       // render prompt page, await selectChoice callback
       nextValue = await new Promise<string>((resolve) => {
         store.write({
@@ -54,9 +60,10 @@ export async function readSequence(
           },
         });
       });
-    } else {
-      // above cases should be exhaustive - this should never be reached
-      unhandled(value);
+      continue;
     }
+
+    // above cases should be exhaustive - this should never be reached
+    unhandled(value);
   }
 }

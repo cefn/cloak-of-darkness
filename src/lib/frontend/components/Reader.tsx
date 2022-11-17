@@ -18,9 +18,8 @@ function renderKind(kind: PageKind) {
     return <Prompt />;
   } else if (kind === "end") {
     return <End />;
-  } else {
-    unhandled(kind);
   }
+  unhandled(kind);
 }
 
 export function Reader(props: { readerStore: Store<ReaderState> }) {
