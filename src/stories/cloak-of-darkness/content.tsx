@@ -1,10 +1,24 @@
 import { END, prompt, tell } from "../../lib/engine/actions";
-import type { Room } from "./types";
+import { ActionSequence } from "../../lib/engine/types";
 
-export function initWorldState() {
+type RoomId = "outside" | "lobby" | "cloakroom" | "bar";
+type WorldState = ReturnType<typeof createWorldState>;
+type Room = (state: WorldState) => ActionSequence<RoomId | typeof END>;
+
+const initialRoomId: RoomId = "outside";
+
+export function createWorldState() {
   return {
     turnsInBar: 0,
     hasCloak: true,
+    roomId: initialRoomId,
+    roomTitles: {
+      bar: <>Bar</>,
+      cloakroom: <>Cloakroom</>,
+      lobby: <>Lobby</>,
+      outside: <>Outside the Opera House</>,
+      [END]: <>You have finished the game</>,
+    },
   };
 }
 
@@ -17,7 +31,7 @@ export function createWorld() {
   };
 }
 
-export const outside: Room = function* () {
+export const outside: Room = function* (state) {
   yield* tell(
     <>
       Hurrying through the rainswept November night, you're glad to see the
