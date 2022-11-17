@@ -1,23 +1,31 @@
-import { createStore } from "@lauf/store";
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { Ui } from "./lib/frontend/components/Ui";
+import { createStore } from "@lauf/store";
+import { Reader } from "./lib/frontend/components/Reader";
 import { initialiseReaderState } from "./lib/frontend/context";
-import { read } from "./lib/frontend/read";
-import { ReaderState } from "./lib/frontend/types";
-import { story } from "./stories/cloak-of-darkness/story";
+import { readStory } from "./lib/frontend/read";
+import { roomStory } from "./lib/engine/formats/room";
 
-// Create store
-const store = createStore<ReaderState>(initialiseReaderState());
+// Load the story
+import { createRooms, createWorldState } from "./stories/cloak-of-darkness";
 
-// launch story which will write to store
-read(story, store);
+// create sequence of story actions
+const sequence = roomStory({
+  createRooms,
+  createWorldState,
+});
+
+// create ui store
+const readerStore = createStore(initialiseReaderState());
+
+// perform story actions against ui store
+readStory(sequence, readerStore);
 
 // render the store
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <div className="flex flex-col min-w-full h-screen">
-      <Ui store={store} />
+      <Reader readerStore={readerStore} />
     </div>
   </React.StrictMode>
 );

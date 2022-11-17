@@ -1,11 +1,12 @@
 import { Store } from "@lauf/store";
-import { Story } from "../engine/types";
+import { ActionSequence } from "../engine/types";
 import { ReaderState } from "./types";
 import { GNexted, unhandled } from "../util";
 
-export async function read(story: Story, store: Store<ReaderState>) {
-  const sequence = story();
-
+export async function readStory(
+  sequence: ActionSequence<void>,
+  store: Store<ReaderState>
+) {
   let nextValue: GNexted<typeof sequence> = undefined;
 
   for (;;) {

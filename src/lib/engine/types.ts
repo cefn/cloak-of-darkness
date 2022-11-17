@@ -31,6 +31,3 @@ export type ActionSequence<Ret> = DelegatingGenerator<
   | ReturnType<typeof prompt>,
   Ret
 >;
-
-/** A story is a factory for a sequence of actions that doesn't return anything */
-export type Story = () => ActionSequence<void>;

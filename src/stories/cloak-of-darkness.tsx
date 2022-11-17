@@ -1,14 +1,13 @@
-import { END, prompt, tell } from "../../lib/engine/actions";
-import type { Room } from "./types";
+import { ActionSequence } from "../lib/engine/types";
+import { END, prompt, tell } from "../lib/engine/actions";
 
-export function initWorldState() {
-  return {
-    turnsInBar: 0,
-    hasCloak: true,
-  };
-}
+type StoryRooms = ReturnType<typeof createRooms>;
+type StoryState = ReturnType<typeof createWorldState>;
 
-export function createWorld() {
+type RoomId = keyof StoryRooms;
+type Room = (state: StoryState) => ActionSequence<RoomId | typeof END>;
+
+export function createRooms() {
   return {
     outside,
     lobby,
@@ -17,7 +16,25 @@ export function createWorld() {
   };
 }
 
-export const outside: Room = function* () {
+export function createWorldState() {
+  // avoid inferring roomId as just string
+  // maybe fixed by satisfies operator in Typescript 4.9
+  const initialRoomId: RoomId = "outside";
+  return {
+    turnsInBar: 0,
+    hasCloak: true,
+    roomId: initialRoomId,
+    roomTitles: {
+      bar: <>Bar</>,
+      cloakroom: <>Cloakroom</>,
+      lobby: <>Lobby</>,
+      outside: <>Outside the Opera House</>,
+      [END]: <>You have finished the game</>,
+    },
+  };
+}
+
+export const outside: Room = function* (state) {
   yield* tell(
     <>
       Hurrying through the rainswept November night, you're glad to see the

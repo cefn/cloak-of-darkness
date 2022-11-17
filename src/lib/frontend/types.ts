@@ -1,7 +1,7 @@
 import { Id, Passage, PromptAction, TellAction } from "../engine/types";
 
-/** Compose a state combining the last action from the story
- * with a callback which progresses to the next page or choice . */
+/** Compose a state combining the last action from the story with a callback
+ * which progresses to the next page or choice . */
 
 interface EmptyState {
   kind: "empty";

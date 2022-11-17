@@ -1,3 +1,7 @@
+export function createSatisfies<Base>() {
+  return <Actual extends Base>(value: Actual) => value;
+}
+
 export function unhandled(item: never) {
   throw new Error(`Cases not exhaustive at runtime - received ${item}`);
 }
@@ -37,5 +41,5 @@ export type GNexted<G extends Generator> = G extends Generator<
 export type DelegatingGenerator<Delegated extends Generator, Ret> = Generator<
   Delegated extends Generator ? GYielded<Delegated> : never,
   Ret,
-  Delegated extends Generator ? GNexted<Delegated> : never
+  any
 >;
