@@ -1,18 +1,21 @@
 import { ActionSequence } from "../lib/engine/types";
 import { END, prompt, tell } from "../lib/engine/actions";
-import { RoomState } from "../lib/engine/formats/room";
+import { RoomsState } from "../lib/engine/formats/room";
 
-/** A Room yields tell and prompt pages, then returns a destination RoomId */
-type Room = (state: WorldState) => ActionSequence<RoomId | typeof END>;
-
-/** State consumed and manipulated within Room Logic */
-interface WorldState extends RoomState<RoomId> {
-  turnsInBar: number;
-  hasCloak: boolean;
+export function createWorldState(): CodWorldState {
+  return {
+    turnsInBar: 0,
+    hasCloak: true,
+    currentRoomId: "outside",
+    roomTitles: {
+      outside: <>Outside the Opera House</>,
+      lobby: <>Lobby</>,
+      cloakroom: <>Cloakroom</>,
+      bar: <>Bar</>,
+      [END]: <>You have finished the game</>,
+    },
+  };
 }
-
-/** Derive RoomId from the room lookup */
-type RoomId = keyof ReturnType<typeof createRooms>;
 
 export function createRooms() {
   return {
@@ -23,22 +26,7 @@ export function createRooms() {
   };
 }
 
-export function createWorldState(): WorldState {
-  return {
-    turnsInBar: 0,
-    hasCloak: true,
-    roomId: "outside",
-    roomTitles: {
-      bar: <>Bar</>,
-      cloakroom: <>Cloakroom</>,
-      lobby: <>Lobby</>,
-      outside: <>Outside the Opera House</>,
-      [END]: <>You have finished the game</>,
-    },
-  };
-}
-
-export const outside: Room = function* (state) {
+export const outside: CodRoom = function* (state) {
   yield* tell(
     <>
       Hurrying through the rainswept November night, you're glad to see the
@@ -52,7 +40,7 @@ export const outside: Room = function* (state) {
   return "lobby";
 };
 
-export const lobby: Room = function* (state) {
+export const lobby: CodRoom = function* (state) {
   const choice = yield* prompt(
     <>
       You are standing in a spacious hall, splendidly decorated in red and gold,
@@ -80,8 +68,8 @@ export const lobby: Room = function* (state) {
   if (choice === "preventedNorth") {
     yield* tell(
       <>
-        You can't go north. The door has locked behind you and there is no
-        visible mechanism to open it.
+        You've only just arrived, and besides, the weather outside seems to be
+        getting worse.
       </>
     );
     return "lobby";
@@ -89,7 +77,7 @@ export const lobby: Room = function* (state) {
   return choice;
 };
 
-export const cloakroom: Room = function* (state) {
+export const cloakroom: CodRoom = function* (state) {
   const choice = yield* prompt(
     <>
       The walls of this small room were clearly once lined with hooks, though
@@ -132,7 +120,7 @@ export const cloakroom: Room = function* (state) {
   return "cloakroom";
 };
 
-export const bar: Room = function* (state) {
+export const bar: CodRoom = function* (state) {
   if (state.hasCloak) {
     return yield* darkBar(state);
   } else {
@@ -140,7 +128,7 @@ export const bar: Room = function* (state) {
   }
 };
 
-export const darkBar: Room = function* (state) {
+export const darkBar: CodRoom = function* (state) {
   state.turnsInBar += 1;
 
   const firstChoice = yield* prompt(
@@ -203,7 +191,7 @@ export const darkBar: Room = function* (state) {
   return "lobby";
 };
 
-export const lightBar: Room = function* (state) {
+export const lightBar: CodRoom = function* (state) {
   yield* tell(
     <>
       The bar, much rougher than you'd have guessed after the opulence of the
@@ -234,3 +222,17 @@ export const lightBar: Room = function* (state) {
   }
   return END;
 };
+
+/** Types that help with auto-completion and type-checking above */
+
+/** State consumed and manipulated within Room Logic */
+interface CodWorldState extends RoomsState<CodRoomId> {
+  turnsInBar: number;
+  hasCloak: boolean;
+}
+
+/** A Room yields tell and prompt pages, then returns a destination RoomId */
+type CodRoom = (state: CodWorldState) => ActionSequence<CodRoomId | typeof END>;
+
+/** Derive RoomId from factory function */
+type CodRoomId = keyof ReturnType<typeof createRooms>;

@@ -8,15 +8,15 @@ export type Rooms<RoomId extends Id, State> = {
 };
 
 /** Minimal world state with a current room and titles for each room. Real stories will extend this */
-export type RoomState<RoomId extends Id> = {
-  roomId: RoomId;
+export type RoomsState<RoomId extends Id> = {
+  currentRoomId: RoomId;
   roomTitles: { [id in RoomId | typeof END]: Passage };
 };
 
 /** ActionSequence delegating story sequences to rooms */
 export function* roomStory<
   RoomId extends Id,
-  WorldState extends RoomState<RoomId>
+  WorldState extends RoomsState<RoomId>
 >(options: {
   createRooms: () => Rooms<RoomId, WorldState>;
   createWorldState: () => WorldState;
@@ -29,12 +29,12 @@ export function* roomStory<
 
   // keep visiting destinations until you reach the end
   for (;;) {
-    const titlePassage = worldState.roomTitles[worldState.roomId];
+    const titlePassage = worldState.roomTitles[worldState.currentRoomId];
     // set title according to room
     yield* title(titlePassage);
 
     // retrieve the next room
-    const room = rooms[worldState.roomId];
+    const room = rooms[worldState.currentRoomId];
 
     // complete room tell/prompt sequence to get next room
     const roomIdOrEnd = yield* room(worldState);
@@ -43,7 +43,7 @@ export function* roomStory<
     if (roomIdOrEnd === END) {
       return;
     } else {
-      worldState.roomId = roomIdOrEnd;
+      worldState.currentRoomId = roomIdOrEnd;
     }
   }
 }
