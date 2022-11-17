@@ -17,7 +17,9 @@ export function createRooms() {
 }
 
 export function createWorldState() {
-  const initialRoomId: RoomId = "outside"; // narrow from string
+  // avoid inferring roomId as just string
+  // will be fixed by satisfies operator in Typescript 4.9
+  const initialRoomId: RoomId = "outside";
   return {
     turnsInBar: 0,
     hasCloak: true,
