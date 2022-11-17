@@ -1,3 +1,7 @@
+export function createSatisfies<Base>() {
+  return <Actual extends Base>(value: Actual) => value;
+}
+
 export function unhandled(item: never) {
   throw new Error(`Cases not exhaustive at runtime - received ${item}`);
 }

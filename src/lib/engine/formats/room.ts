@@ -2,13 +2,13 @@ import { END, title } from "../actions";
 import { ActionSequence, Id, Passage } from "../types";
 
 /** Rooms are ActionSequences named by ids, whose sequences result in the next
- * id room id */
-export type World<RoomId extends Id, State> = {
+ * id room id. This structure defines rooms that reference each other. */
+export type Rooms<RoomId extends Id, State> = {
   [id in RoomId]: (state: State) => ActionSequence<RoomId | typeof END>;
 };
 
-/** Minimal world state that has a current room and room titles. Real stories will extend this */
-export type WorldState<RoomId extends Id> = {
+/** Minimal world state with a current room and titles for each room. Real stories will extend this */
+export type RoomState<RoomId extends Id> = {
   roomId: RoomId;
   roomTitles: { [id in RoomId | typeof END]: Passage };
 };
@@ -16,34 +16,34 @@ export type WorldState<RoomId extends Id> = {
 /** ActionSequence delegating story sequences to rooms */
 export function* roomStory<
   RoomId extends Id,
-  State extends WorldState<RoomId>
+  WorldState extends RoomState<RoomId>
 >(options: {
-  createWorld: () => World<RoomId, State>;
-  createWorldState: () => State;
+  createRooms: () => Rooms<RoomId, WorldState>;
+  createWorldState: () => WorldState;
 }): ActionSequence<void> {
-  const { createWorld, createWorldState } = options;
-  // initialise
-  const world = createWorld();
-  const worldState = createWorldState();
+  const { createRooms, createWorldState } = options;
 
-  type Room = typeof world[RoomId];
+  // initialise
+  const rooms = createRooms();
+  const worldState = createWorldState();
 
   // keep visiting destinations until you reach the end
   for (;;) {
-    // populate the title according to the current room
-    yield* title(worldState.roomTitles[worldState.roomId]);
+    const titlePassage = worldState.roomTitles[worldState.roomId];
+    // set title according to room
+    yield* title(titlePassage);
 
-    // otherwise retrieve the room from the destination (RoomId)
-    const room: Room = world[worldState.roomId];
+    // retrieve the next room
+    const room = rooms[worldState.roomId];
 
-    // complete room sequence to be given next destination
-    const destination = yield* room(worldState);
+    // complete room tell/prompt sequence to get next room
+    const roomIdOrEnd = yield* room(worldState);
 
     // check if story is complete
-    if (destination === END) {
+    if (roomIdOrEnd === END) {
       return;
     } else {
-      worldState.roomId = destination;
+      worldState.roomId = roomIdOrEnd;
     }
   }
 }

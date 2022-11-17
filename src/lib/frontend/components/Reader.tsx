@@ -5,10 +5,10 @@ import { ReaderState } from "../types";
 import { Prompt } from "./Prompt";
 import { Tell } from "./Tell";
 
-export function Ui(props: { store: Store<ReaderState> }) {
-  const kind = useSelected(props.store, (state) => state.page.kind);
+export function Reader(props: { readerStore: Store<ReaderState> }) {
+  const kind = useSelected(props.readerStore, (state) => state.page.kind);
   return (
-    <ReaderStoreContext.Provider value={props.store}>
+    <ReaderStoreContext.Provider value={props.readerStore}>
       {kind === "empty" ? (
         <p>Story not yet loaded</p>
       ) : kind === "tell" ? (

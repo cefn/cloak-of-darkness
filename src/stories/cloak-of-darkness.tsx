@@ -1,13 +1,23 @@
-import { END, prompt, tell } from "../../lib/engine/actions";
-import { ActionSequence } from "../../lib/engine/types";
+import { ActionSequence } from "../lib/engine/types";
+import { END, prompt, tell } from "../lib/engine/actions";
 
-type RoomId = "outside" | "lobby" | "cloakroom" | "bar";
-type WorldState = ReturnType<typeof createWorldState>;
-type Room = (state: WorldState) => ActionSequence<RoomId | typeof END>;
+type CloakWorld = ReturnType<typeof createRooms>;
+type CloakState = ReturnType<typeof createWorldState>;
 
-const initialRoomId: RoomId = "outside";
+type RoomId = keyof CloakWorld;
+type Room = (state: CloakState) => ActionSequence<RoomId | typeof END>;
+
+export function createRooms() {
+  return {
+    outside,
+    lobby,
+    cloakroom,
+    bar,
+  };
+}
 
 export function createWorldState() {
+  const initialRoomId: RoomId = "outside"; // narrow from string
   return {
     turnsInBar: 0,
     hasCloak: true,
@@ -19,15 +29,6 @@ export function createWorldState() {
       outside: <>Outside the Opera House</>,
       [END]: <>You have finished the game</>,
     },
-  };
-}
-
-export function createWorld() {
-  return {
-    outside,
-    lobby,
-    cloakroom,
-    bar,
   };
 }
 
