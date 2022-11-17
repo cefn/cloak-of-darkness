@@ -1,6 +1,6 @@
-import { ActionSequence } from "../lib/engine/types";
-import { END, prompt, tell } from "../lib/engine/actions";
-import { RoomsState } from "../lib/engine/formats/room";
+import type { ActionSequence } from "../lib/engine/types";
+import type { RoomsState } from "../lib/engine/formats/room";
+import { tell, prompt, END } from "../lib/engine/actions";
 
 export function createWorldState(): CodWorldState {
   return {
@@ -9,9 +9,9 @@ export function createWorldState(): CodWorldState {
     currentRoomId: "outside",
     roomTitles: {
       outside: <>Outside the Opera House</>,
-      lobby: <>Lobby</>,
-      cloakroom: <>Cloakroom</>,
-      bar: <>Bar</>,
+      lobby: <>In the Lobby</>,
+      cloakroom: <>In the Cloakroom</>,
+      bar: <>In the Bar</>,
       [END]: <>You have finished the game</>,
     },
   };

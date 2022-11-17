@@ -27,23 +27,32 @@ export function* roomStory<
   const rooms = createRooms();
   const worldState = createWorldState();
 
+  // utility to align title with new destination
+  function* refreshTitle(destination: RoomId | typeof END) {
+    const { roomTitles } = worldState;
+    const titlePassage = roomTitles[destination];
+    return yield* title(titlePassage);
+  }
+
+  // set title for initial room
+  yield* refreshTitle(worldState.currentRoomId);
+
   // keep visiting destinations until you reach the end
   for (;;) {
-    const titlePassage = worldState.roomTitles[worldState.currentRoomId];
-    // set title according to room
-    yield* title(titlePassage);
-
     // retrieve the next room
     const room = rooms[worldState.currentRoomId];
 
-    // complete room tell/prompt sequence to get next room
-    const roomIdOrEnd = yield* room(worldState);
+    // complete room tell/prompt sequence and get next room
+    const destination = yield* room(worldState);
+
+    // set title according to room
+    yield* refreshTitle(destination);
 
     // check if story is complete
-    if (roomIdOrEnd === END) {
+    if (destination === END) {
       return;
     } else {
-      worldState.currentRoomId = roomIdOrEnd;
+      worldState.currentRoomId = destination;
     }
   }
 }

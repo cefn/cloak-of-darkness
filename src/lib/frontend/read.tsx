@@ -3,7 +3,7 @@ import { ActionSequence } from "../engine/types";
 import { ReaderState } from "./types";
 import { GNexted, unhandled } from "../util";
 
-export async function readStory(
+export async function readSequence(
   sequence: ActionSequence<void>,
   store: Store<ReaderState>
 ) {
@@ -13,6 +13,16 @@ export async function readStory(
     // get the next action
     const { done, value } = sequence.next(nextValue);
     if (done) {
+      // render end page, await restart callback
+      await new Promise<void>((resolve) => {
+        store.write({
+          ...store.read(),
+          page: {
+            kind: "end",
+            restart: resolve,
+          },
+        });
+      });
       return value;
     }
 

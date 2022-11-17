@@ -7,15 +7,22 @@ interface EmptyState {
   kind: "empty";
 }
 
-export type TellState = TellAction & {
+interface EndState {
+  kind: "end";
+  restart: () => void;
+}
+
+type TellState = TellAction & {
   turnPage: () => void;
 };
 
-export type PromptState<ChoiceId extends Id> = PromptAction<ChoiceId> & {
+type PromptState<ChoiceId extends Id> = PromptAction<ChoiceId> & {
   selectChoice: (choice: ChoiceId) => void;
 };
 
-type PageState = TellState | PromptState<Id> | EmptyState;
+type PageState = TellState | PromptState<Id> | EmptyState | EndState;
+
+export type PageKind = PageState["kind"];
 
 export interface ReaderState {
   title: Passage;
