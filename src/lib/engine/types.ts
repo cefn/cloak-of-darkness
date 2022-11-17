@@ -31,3 +31,5 @@ export type ActionSequence<Ret> = DelegatingGenerator<
   | ReturnType<typeof prompt>,
   Ret
 >;
+
+export type Story = () => ActionSequence<void>;

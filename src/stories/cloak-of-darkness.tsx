@@ -1,6 +1,6 @@
-import type { ActionSequence } from "../lib/engine/types";
-import type { RoomsState } from "../lib/engine/formats/room";
-import { END } from "../lib/engine/formats/room";
+import type { ActionSequence, Story } from "../lib/engine/types";
+import type { RoomWorldState } from "../lib/engine/formats/room";
+import { roomStory, END } from "../lib/engine/formats/room";
 import { tell, prompt } from "../lib/engine/actions";
 
 export function createWorldState(): CodWorldState {
@@ -25,6 +25,16 @@ export function createRooms() {
     bar,
   };
 }
+
+export const story: Story = function* () {
+  const rooms = createRooms();
+  const worldState = createWorldState();
+
+  yield* roomStory({
+    rooms,
+    worldState,
+  });
+};
 
 export const outside: CodRoom = function* (state) {
   yield* tell(
@@ -226,7 +236,7 @@ export const lightBar: CodRoom = function* (state) {
 /** Types that help with auto-completion and type-checking above */
 
 /** State consumed and manipulated within Room Logic */
-interface CodWorldState extends RoomsState<CodRoomId> {
+interface CodWorldState extends RoomWorldState<CodRoomId> {
   turnsInBar: number;
   hasCloak: boolean;
 }

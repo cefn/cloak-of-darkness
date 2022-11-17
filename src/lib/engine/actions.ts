@@ -1,8 +1,5 @@
 import { Passage, PromptAction, TellAction, TitleAction } from "./types";
 
-/** A value returned to indicate the end of the story */
-export const END = Symbol();
-
 export function* title(passage: Passage): Generator<TitleAction, void, void> {
   yield {
     kind: "title",

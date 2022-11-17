@@ -1,12 +1,11 @@
 import { Store } from "@lauf/store";
-import { ActionSequence } from "../engine/types";
+import { Story } from "../engine/types";
 import { ReaderState } from "./types";
 import { GNexted, unhandled } from "../util";
 
-export async function readSequence(
-  sequence: ActionSequence<void>,
-  store: Store<ReaderState>
-) {
+export async function readStory(story: Story, store: Store<ReaderState>) {
+  const sequence = story();
+
   let nextValue: GNexted<typeof sequence> = undefined;
 
   for (;;) {
@@ -23,6 +22,7 @@ export async function readSequence(
           },
         });
       });
+      // sequence has ended with `value`
       return value;
     }
 
