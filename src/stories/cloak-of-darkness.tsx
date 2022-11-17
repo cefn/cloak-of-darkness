@@ -3,16 +3,16 @@ import type { RoomWorldState } from "../lib/engine/formats/room";
 import { roomStory, END } from "../lib/engine/formats/room";
 import { tell, prompt } from "../lib/engine/actions";
 
-/** Ids of all rooms in the story. */
+/** Locations in the story. */
 type RoomId = "outside" | "lobby" | "cloakroom" | "bar";
 
-/** State consumed and manipulated within Room Logic */
+/** Player state consumed and manipulated within each room */
 interface WorldState extends RoomWorldState<RoomId> {
   turnsInBar: number;
   hasCloak: boolean;
 }
 
-/** A Room yields tell and prompt pages, returns a destination RoomId (or END)*/
+/** An ActionSequence yields tell and prompt pages, returns a destination RoomId (or END)*/
 type Room = (state: WorldState) => ActionSequence<RoomId | typeof END>;
 
 export const outside: Room = function* (state) {
@@ -120,7 +120,7 @@ export const bar: Room = function* (state) {
 export const darkBar: Room = function* (state) {
   state.turnsInBar += 1;
 
-  const firstChoice = yield* prompt(
+  const firstAttempt = yield* prompt(
     <>
       You can't see a thing! Not even the door you entered by--was it north,
       south, east or west?
@@ -132,13 +132,13 @@ export const darkBar: Room = function* (state) {
       west: <>Grope west</>,
     }
   );
-  if (firstChoice === "north") {
+  if (firstAttempt === "north") {
     return "lobby";
   }
 
   state.turnsInBar += 1;
 
-  const secondChoice = yield* prompt(
+  const secondAttempt = yield* prompt(
     <>
       Blundering around in the dark isn't a good idea! You can't tell left from
       right, let alone east from west or north from south.
@@ -152,13 +152,13 @@ export const darkBar: Room = function* (state) {
       right: <>Stumble Right</>,
     }
   );
-  if (secondChoice === "north") {
+  if (secondAttempt === "north") {
     return "lobby";
   }
 
   state.turnsInBar += 1;
 
-  const thirdChoice = yield* prompt(
+  const thirdAttempt = yield* prompt(
     <>
       No, this isn't getting you anywhere... Let's see, the door was south,
       wasn't it? So the exit must be north, unless you've gotten turned around.
@@ -168,7 +168,7 @@ export const darkBar: Room = function* (state) {
       unconfident: <>Maybe I've got turned around</>,
     }
   );
-  if (thirdChoice === "confident") {
+  if (thirdAttempt === "confident") {
     return "lobby";
   }
 
@@ -212,7 +212,8 @@ export const lightBar: Room = function* (state) {
   return END;
 };
 
-/** Delegates to roomStory() to navigate between ActionSequences in different rooms */
+/** Delegates to roomStory() which yields title/tell/prompt actions, combining the
+ * rooms into a navigable world having shared global state. */
 export const story: Story = function* () {
   const rooms = {
     outside,
