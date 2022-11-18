@@ -1,3 +1,33 @@
+export function mappedGenerator<Yielded, Returned, Nexted, YieldedMapped>(
+  generator: Generator<Yielded, Returned, Nexted>,
+  mapFn: (yielded: Yielded) => YieldedMapped
+): Generator<YieldedMapped, Returned, Nexted> {
+  function mapResult(result: IteratorResult<Yielded, Returned>) {
+    const { value, done } = result;
+    if (!done) {
+      return {
+        done,
+        value: mapFn(value),
+      };
+    }
+    return result;
+  }
+  return {
+    [Symbol.iterator]() {
+      return this;
+    },
+    next(...args) {
+      return mapResult(generator.next(...args));
+    },
+    return(value) {
+      return mapResult(generator.return(value));
+    },
+    throw(e) {
+      return mapResult(generator.throw(e));
+    },
+  };
+}
+
 export function createSatisfies<Base>() {
   return <Actual extends Base>(value: Actual) => value;
 }
