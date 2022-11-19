@@ -51,6 +51,6 @@ export const story: Story = function* () {
     return;
   }
   
-  // this should never be reached 
+  // should never be reached 
   choice satisfies never
 };

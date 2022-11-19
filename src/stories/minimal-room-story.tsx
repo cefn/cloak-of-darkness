@@ -1,6 +1,6 @@
 import type { ActionSequence, Story } from "../lib/engine/types";
-import type { RoomWorldState } from "../lib/engine/extensions/room";
-import { roomStory, END } from "../lib/engine/extensions/room";
+import type { RoomWorldState } from "../lib/engine/extensions/room/roomTypes";
+import { roomStory, END } from "../lib/engine/extensions/room/roomStory";
 import { tell } from "../lib/engine/actions";
 
 /** Locations in the story. */

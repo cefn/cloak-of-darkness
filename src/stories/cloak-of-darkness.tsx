@@ -1,8 +1,7 @@
-import type { Action, ActionSequence, Story } from "../lib/engine/types";
-import { addRoomHeader, RoomWorldState } from "../lib/engine/extensions/room";
-import { roomStory, END } from "../lib/engine/extensions/room";
+import type { ActionSequence, Story } from "../lib/engine/types";
+import type { RoomWorldState } from "../lib/engine/extensions/room/roomTypes";
 import { tell, prompt } from "../lib/engine/actions";
-import { decorateSequence } from "../lib/util";
+import { roomStory, END } from "../lib/engine/extensions/room/roomStory";
 
 /** Locations in the story. */
 type RoomId = "outside" | "lobby" | "cloakroom" | "bar";
@@ -243,10 +242,5 @@ export const story: Story = function* () {
     worldState,
   });
 
-  //decorate each tell or prompt with a header naming the room
-  const headedSequence = decorateSequence(sequence, (action: Action) =>
-    addRoomHeader(action, worldState)
-  );
-
-  yield* headedSequence;
+  yield* sequence;
 };
