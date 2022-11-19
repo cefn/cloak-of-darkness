@@ -1,6 +1,5 @@
 import type { Story } from "../lib/engine/types";
 import { prompt, tell } from "../lib/engine/actions";
-import { unhandled } from "../lib/util";
 
 export const story: Story = function* () {
   yield* tell(
@@ -38,6 +37,7 @@ export const story: Story = function* () {
     );
     return;
   }
+  
   if (choice === "run") {
     yield* tell(
       <>
@@ -50,5 +50,7 @@ export const story: Story = function* () {
     );
     return;
   }
+  
+  // this should never be reached 
   choice satisfies never
 };
