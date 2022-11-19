@@ -12,27 +12,8 @@ export async function readStory(story: Story, store: Store<ReaderState>) {
     // get the next action
     const { done, value } = sequence.next(nextValue);
     if (done) {
-      // render end page, await restart callback
-      await new Promise<void>((resolve) => {
-        store.write({
-          ...store.read(),
-          page: {
-            kind: "end",
-            restart: resolve,
-          },
-        });
-      });
       // sequence has ended with `value`
       return value;
-    }
-
-    if (value.kind === "title") {
-      // render title
-      store.write({
-        ...store.read(),
-        title: value.passage,
-      });
-      continue;
     }
 
     if (value.kind === "tell") {

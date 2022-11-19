@@ -1,5 +1,4 @@
-import { title } from "../actions";
-import { ActionSequence, Id, Passage } from "../types";
+import { Action, ActionSequence, Id, Passage } from "../types";
 
 /** Types and utilities to create an ActionSequence structured around multiple
  * rooms in a world with global state.
@@ -34,6 +33,24 @@ type RoomStoryOptions<
   rooms: RoomLookup<RoomId, WorldState>;
 };
 
+/** Modifies the passage in a tell or prompt, adding a header. */
+export function addRoomHeader<RoomId extends string>(
+  action: Action,
+  roomWorldState: RoomWorldState<RoomId>
+): Action {
+  const { roomTitles, currentRoomId } = roomWorldState;
+  const title = roomTitles[currentRoomId];
+  return {
+    ...action,
+    passage: (
+      <>
+        <h3>{title}</h3>
+        {action.passage}
+      </>
+    ),
+  };
+}
+
 /** ActionSequence delegating story sequences to rooms */
 export function* roomStory<
   RoomId extends Id,
@@ -41,23 +58,19 @@ export function* roomStory<
 >(options: RoomStoryOptions<RoomId, WorldState>): ActionSequence<void> {
   const { rooms, worldState } = options;
 
-  let destination: RoomId | typeof END = worldState.currentRoomId;
+  let room = rooms[worldState.currentRoomId];
 
-  // keep visiting destinations until you reach the end
   for (;;) {
+    // room sequence returns destination or END
+    const roomIdOrEnd = yield* room(worldState);
+
     // check if story is complete
-    if (destination === END) {
-      yield* title(<>Game Over</>);
+    if (roomIdOrEnd === END) {
       return;
     }
 
-    worldState.currentRoomId = destination;
-    yield* title(worldState.roomTitles[destination]);
-
-    // retrieve the next room
-    const room = rooms[worldState.currentRoomId];
-
-    // complete room tell/prompt sequence and get next room
-    destination = yield* room(worldState);
+    // else prepare for next room sequence
+    room = rooms[roomIdOrEnd];
+    worldState.currentRoomId = roomIdOrEnd;
   }
 }

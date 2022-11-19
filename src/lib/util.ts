@@ -1,3 +1,38 @@
+export function decorateSequence<
+  G extends Generator<Yielded>,
+  Yielded,
+  Decorated
+>(
+  generator: G,
+  decorate: (yielded: Yielded) => Decorated
+): Generator<Decorated, GReturned<G>, GNexted<G>> {
+  function mapResult(result: IteratorResult<Yielded, GReturned<G>>) {
+    const { value, done } = result;
+    if (!done) {
+      return {
+        done,
+        value: decorate(value),
+      };
+    }
+    return result;
+  }
+
+  return {
+    [Symbol.iterator]() {
+      return this;
+    },
+    next(...args) {
+      return mapResult(generator.next(...args));
+    },
+    return(value) {
+      return mapResult(generator.return(value));
+    },
+    throw(e) {
+      return mapResult(generator.throw(e));
+    },
+  };
+}
+
 export function createSatisfies<Base>() {
   return <Actual extends Base>(value: Actual) => value;
 }
