@@ -3,7 +3,6 @@ import { useSelected } from "@lauf/store-react";
 import { unhandled } from "../../util";
 import { ReaderStoreContext } from "../context";
 import { ReaderState } from "../types";
-import { End } from "./End";
 import { Prompt } from "./Prompt";
 import { Tell } from "./Tell";
 
@@ -16,10 +15,8 @@ function renderKind(kind: PageKind) {
     return <Tell />;
   } else if (kind === "prompt") {
     return <Prompt />;
-  } else if (kind === "end") {
-    return <End />;
-  }
-  unhandled(kind);
+  } 
+  kind satisfies never;
 }
 
 export function Reader(props: { readerStore: Store<ReaderState> }) {

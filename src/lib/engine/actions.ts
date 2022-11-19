@@ -1,9 +1,15 @@
-import { Passage, PromptAction, TellAction, TitleAction } from "./types";
+import { Id, Passage } from "./types";
 
-export function* title(passage: Passage): Generator<TitleAction, void, void> {
-  yield {
-    kind: "title",
-    passage,
+export interface TellAction {
+  kind: "tell";
+  passage: Passage;
+}
+
+export interface PromptAction<ChoiceId extends Id> {
+  kind: "prompt";
+  passage: Passage;
+  choices: {
+    [id in ChoiceId]?: Passage;
   };
 }
 

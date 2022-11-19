@@ -1,15 +1,11 @@
-import { Id, Passage, PromptAction, TellAction } from "../engine/types";
+import { PromptAction, TellAction } from "../engine/actions";
+import { Id, Passage } from "../engine/types";
 
 /** Compose a state combining the last action from the story with a callback
  * which progresses to the next page or choice . */
 
 interface EmptyState {
   kind: "empty";
-}
-
-interface EndState {
-  kind: "end";
-  restart: () => void;
 }
 
 type TellState = TellAction & {
@@ -20,7 +16,7 @@ type PromptState<ChoiceId extends Id> = PromptAction<ChoiceId> & {
   selectChoice: (choice: ChoiceId) => void;
 };
 
-type PageState = TellState | PromptState<Id> | EmptyState | EndState;
+type PageState = TellState | PromptState<Id> | EmptyState;
 
 export type PageKind = PageState["kind"];
 

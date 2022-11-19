@@ -6,7 +6,7 @@ import { initialiseReaderState } from "./lib/frontend/context";
 import { Reader } from "./lib/frontend/components/Reader";
 
 // Load the story
-import { story } from "./stories/cloak-of-darkness";
+import { menu } from "./stories/menu";
 
 // create the watchable ReaderState
 const readerStore = createStore(initialiseReaderState());
@@ -14,7 +14,7 @@ const readerStore = createStore(initialiseReaderState());
 async function readForever() {
   for (;;) {
     // perform ActionSequence, updating the ReaderState
-    await readStory(story, readerStore);
+    await readStory(menu, readerStore);
   }
 }
 

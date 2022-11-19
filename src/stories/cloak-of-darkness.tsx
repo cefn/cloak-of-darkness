@@ -1,7 +1,8 @@
-import type { ActionSequence, Story } from "../lib/engine/types";
-import type { RoomWorldState } from "../lib/engine/formats/room";
-import { roomStory, END } from "../lib/engine/formats/room";
+import type { Action, ActionSequence, Story } from "../lib/engine/types";
+import { addRoomHeader, RoomWorldState } from "../lib/engine/extensions/room";
+import { roomStory, END } from "../lib/engine/extensions/room";
 import { tell, prompt } from "../lib/engine/actions";
+import { decorateSequence } from "../lib/util";
 
 /** Locations in the story. */
 type RoomId = "outside" | "lobby" | "cloakroom" | "bar";
@@ -212,9 +213,10 @@ export const lightBar: Room = function* (state) {
   return END;
 };
 
-/** Delegates to roomStory() which yields title/tell/prompt actions, combining the
- * rooms into a navigable world having shared global state. */
+/** Delegates to a room based sequence to yield title/tell/prompt actions. These
+ * combine the rooms into a navigable world having shared global state. */
 export const story: Story = function* () {
+  // populate the rooms (a lookup used for navigation)
   const rooms = {
     outside,
     lobby,
@@ -222,6 +224,7 @@ export const story: Story = function* () {
     bar,
   };
 
+  // initial world (state that can drive story logic)
   const worldState: WorldState = {
     turnsInBar: 0,
     hasCloak: true,
@@ -234,8 +237,16 @@ export const story: Story = function* () {
     },
   };
 
-  yield* roomStory({
+  // roomStory is a navigation-based interaction for all room-based stories
+  const sequence = roomStory({
     rooms,
     worldState,
   });
+
+  //decorate each tell or prompt with a header naming the room
+  const headedSequence = decorateSequence(sequence, (action: Action) =>
+    addRoomHeader(action, worldState)
+  );
+
+  yield* headedSequence;
 };

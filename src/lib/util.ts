@@ -1,17 +1,22 @@
-export function mappedGenerator<Yielded, Returned, Nexted, YieldedMapped>(
-  generator: Generator<Yielded, Returned, Nexted>,
-  mapFn: (yielded: Yielded) => YieldedMapped
-): Generator<YieldedMapped, Returned, Nexted> {
-  function mapResult(result: IteratorResult<Yielded, Returned>) {
+export function decorateSequence<
+  G extends Generator<Yielded>,
+  Yielded,
+  Decorated
+>(
+  generator: G,
+  decorate: (yielded: Yielded) => Decorated
+): Generator<Decorated, GReturned<G>, GNexted<G>> {
+  function mapResult(result: IteratorResult<Yielded, GReturned<G>>) {
     const { value, done } = result;
     if (!done) {
       return {
         done,
-        value: mapFn(value),
+        value: decorate(value),
       };
     }
     return result;
   }
+
   return {
     [Symbol.iterator]() {
       return this;
