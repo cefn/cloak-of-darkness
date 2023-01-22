@@ -22,6 +22,7 @@ export const story: Story = function* () {
     {
       run: <>Run away</>,
       sleep: <>Go back to sleep</>,
+      spy: <> Peek through the door</>
     }
   );
   if (choice === "sleep") {
@@ -39,6 +40,18 @@ export const story: Story = function* () {
   }
   
   if (choice === "run") {
+    yield* tell(
+      <>
+        <h1>You lose!</h1>
+        <>
+          You run away and die violently in an accident with agricultural
+          machinery. What a horrible way to go.
+        </>
+      </>
+    );
+    return;
+  }
+  if (choice === "spy") {
     yield* tell(
       <>
         <h1>You lose!</h1>
